@@ -1,9 +1,6 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import time
 import cv2
-from skimage.feature import hog
-from skimage import exposure
 
 # Determine if the sifted images match using the FLANN library for the Nearest Neighbor method
 # (incorporated into openCV). Prints resulting marked-up image for matches and run-time for comparison
@@ -25,7 +22,7 @@ def FLANNMethod(descriptors, keyPoints, runTimes, folder, grayscale):
     imgFile="{}/flannMatcher.png".format(folder)
     cv2.imwrite(imgFile,featureMatchedPic)
 
-    print("Total FLANN Method Time: {} seconds".format("%.3f"%runTimes[2]))
+    print("Total FLANN Method Time: {} seconds".format("%.3f"%runTimes[0]))
 
 # Determine if the sifted images match using the Brute force method. Prints resulting
 # marked-up image for matches and run-time for comparison to Brute Force method
@@ -44,7 +41,7 @@ def bruteForceMethod(descriptors, keyPoints, runTimes, folder, grayscale):
     imgFile = "{}/bruteForceMatch.png".format(folder)
     cv2.imwrite(imgFile, featureMatchedPic)
     
-    print("Total Brute Force Method Time: {} seconds".format("%.3f"%runTimes[3]))
+    print("Total Brute Force Method Time: {} seconds".format("%.3f"%runTimes[1]))
 
 # Filters through the matched points found in the two compared the images
 # and returns the stronger-coorelated matches    
@@ -64,7 +61,6 @@ def filterMatches(unfilteredMatches, method):
 # Uses Harris Corner Detection to extract corners and infer features of an image
 def analyzePics(images, folder):
     index = 1
-    hogIndex = 0
     runTimes = []
     keyPoints = []
     grayscale = []
@@ -96,27 +92,6 @@ def analyzePics(images, folder):
         figureName = "{}/siftedImg{}.png".format(folder,index)
         cv2.imwrite(figureName,siftedPic)
         
-        # Use HOG Method
-        beginning = time.time()
-        fd, hog_image = hog(floatPic, orientations=8, pixels_per_cell=(16, 16), cells_per_block=(1, 1), visualize=True, multichannel=False)
-
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8, 4), sharex=True, sharey=True)
-        
-        ax1.axis('off')
-        ax1.imshow(floatPic, cmap=plt.cm.gray)
-        ax1.set_title('Input image')
-        # Rescale histogram for better display
-        hog_image_rescaled = exposure.rescale_intensity(hog_image, in_range=(0, 10))
-
-        ax2.axis('off')
-        ax2.imshow(hog_image_rescaled, cmap=plt.cm.gray)
-        ax2.set_title('Histogram of Oriented Gradients')
-        plt.show()
-        finish = time.time()
-        runTimes.append(finish-beginning)
-        print("Total HOG Method Time: {} seconds".format("%.3f"%runTimes[hogIndex]))
-
-        hogIndex+=1
         index+=1
 
     # Step 3: Determine if sifted images match using FLANN and brute force techniques
@@ -125,7 +100,7 @@ def analyzePics(images, folder):
     
 # Extracts images from data folder and passes the to analyzePics to compare the 
 # images and find matched points
-def ha4Sol():
+def progDriver():
     storageFold="figures"
 
     notreDameFold="{}/notreDameFigs".format(storageFold)
@@ -134,10 +109,10 @@ def ha4Sol():
     notreImgs = [notreImg1, notreImg2]
     analyzePics(notreImgs, notreDameFold)
 
-    customFold="{}/customFigs".format(storageFold)
+    rushmoreFold="{}/rushmoreFigs".format(storageFold)
     pantheonImg1 = "./data/Rushmore/mountRushmore1.jpg"
     pantheonImg2 = "./data/Rushmore/mountRushmore2.jpg"
     pantheonImgs = [pantheonImg1,pantheonImg2]
-    analyzePics(pantheonImgs, customFold)
+    analyzePics(pantheonImgs, rushmoreFold)
 
-ha4Sol()
+progDriver()
